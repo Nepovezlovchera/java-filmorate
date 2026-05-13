@@ -18,7 +18,7 @@ public class FilmControllerTest {
     private FilmController controller;
 
     @BeforeEach
-    void setUp() {
+    void contextLoads() {
         controller = new FilmController();
     }
 

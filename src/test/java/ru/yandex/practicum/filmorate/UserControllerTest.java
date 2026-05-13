@@ -2,27 +2,24 @@ package ru.yandex.practicum.filmorate;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.controller.UserController;
 import ru.yandex.practicum.filmorate.exception.ConditionsNotMetException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
 public class UserControllerTest {
 
     private UserController controller;
 
     @BeforeEach
-    void setUp() {
+    void contextLoads() {
         controller = new UserController();
     }
+
     private User makeUserForTest(String email, String login, String name, LocalDate birthday) {
         User user = new User();
         user.setEmail(email);
@@ -32,7 +29,6 @@ public class UserControllerTest {
         return user;
     }
 
-    //createUser
     @Test
     void shouldCreateUserSuccessfully() {
         User user = makeUserForTest("test@mail.ru", "login", "Имя", LocalDate.of(1990, 1, 1));
@@ -103,8 +99,6 @@ public class UserControllerTest {
         assertDoesNotThrow(() -> controller.createUser(user));
     }
 
-    //updateUser
-
     @Test
     void shouldThrowWhenUpdateWithoutId() {
         User user = makeUserForTest("test@mail.ru", "login", "Имя", LocalDate.of(1990, 1, 1));
@@ -170,5 +164,4 @@ public class UserControllerTest {
         assertEquals("Новое", result.getName());
         assertEquals(LocalDate.of(1995, 5, 5), result.getBirthday());
     }
-
 }
