@@ -19,7 +19,7 @@ public class UserController {
 
 
     private final Map<Long, User> users = new HashMap<>();
-    private final static int ZERO = 0;
+    private static final int ZERO = 0;
 
     @GetMapping
     public Collection<User> getusers() {

@@ -19,7 +19,7 @@ public class FilmController {
 
     private static final LocalDate CINEMA_BIRTHDAY = LocalDate.of(1895, 12, 28);
     private static final int MAX_DESCRIPTION_LENGTH = 200;
-    private final static int ZERO = 0;
+    private static final int ZERO = 0;
 
     private final Map<Long, Film> films = new HashMap<>();
 
