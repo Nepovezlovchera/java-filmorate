@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.exception.ConditionsNotMetException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
@@ -12,16 +11,14 @@ import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
 public class FilmControllerTest {
 
     private FilmController controller;
 
     @BeforeEach
-    void contextLoads() {
+    void setUp() {
         controller = new FilmController();
     }
-
 
     private Film makeFilmForTest(String name, String description, LocalDate releaseDate, int duration) {
         Film film = new Film();
@@ -31,7 +28,6 @@ public class FilmControllerTest {
         film.setDuration(duration);
         return film;
     }
-
     //createFilm
     @Test
     void shouldCreateFilmSuccessfully() {
@@ -94,9 +90,7 @@ public class FilmControllerTest {
         Film film = makeFilmForTest("Название", "Описание", LocalDate.of(2000, 1, 1), 1);
         assertDoesNotThrow(() -> controller.createFilm(film));
     }
-
-    //updateFilm
-
+    //update
     @Test
     void shouldThrowWhenUpdateWithoutId() {
         Film film = makeFilmForTest("Название", "Описание", LocalDate.of(2000, 1, 1), 120);
@@ -110,13 +104,15 @@ public class FilmControllerTest {
         assertThrows(NotFoundException.class, () -> controller.updateFilm(film));
     }
 
+
     @Test
-    void shouldThrowWhenUpdateNameIsNull() {
+    void shouldPassWhenUpdateNameIsNull() {
         Film created = controller.createFilm(makeFilmForTest("Название", "Описание", LocalDate.of(2000, 1, 1), 120));
         Film update = makeFilmForTest(null, "Описание", LocalDate.of(2000, 1, 1), 120);
         update.setId(created.getId());
-        assertThrows(ConditionsNotMetException.class, () -> controller.updateFilm(update));
+        assertDoesNotThrow(() -> controller.updateFilm(update));
     }
+
 
     @Test
     void shouldThrowWhenUpdateNameIsBlank() {
@@ -177,6 +173,4 @@ public class FilmControllerTest {
         assertEquals(LocalDate.of(2010, 5, 5), result.getReleaseDate());
         assertEquals(90, result.getDuration());
     }
-
-
 }

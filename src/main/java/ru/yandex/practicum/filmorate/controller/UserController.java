@@ -58,13 +58,13 @@ public class UserController {
     }
 
     private void validateUpdate(User user) {
-        if (user.getEmail() != null || user.getEmail().isBlank()) {
+        if (user.getEmail() != null && user.getEmail().isBlank()) {
             throw new ConditionsNotMetException("Электронная почта не может быть пустой");
         }
         if (!user.getEmail().contains("@")) {
             throw new ConditionsNotMetException("Электронная почта должна содержать символ @");
         }
-        if (user.getLogin() == null || user.getLogin().isBlank()) {
+        if (user.getLogin() == null && user.getLogin().isBlank()) {
             throw new ConditionsNotMetException("Логин не может быть пустым");
         }
         if (user.getLogin().contains(" ")) {

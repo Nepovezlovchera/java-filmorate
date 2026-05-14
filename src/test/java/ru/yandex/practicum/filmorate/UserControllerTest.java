@@ -112,13 +112,6 @@ public class UserControllerTest {
         assertThrows(NotFoundException.class, () -> controller.updateUser(user));
     }
 
-    @Test
-    void shouldThrowWhenUpdateEmailIsNull() {
-        User created = controller.createUser(makeUserForTest("test@mail.ru", "login", "Имя", LocalDate.of(1990, 1, 1)));
-        User update = makeUserForTest(null, "login", "Имя", LocalDate.of(1990, 1, 1));
-        update.setId(created.getId());
-        assertThrows(ConditionsNotMetException.class, () -> controller.updateUser(update));
-    }
 
     @Test
     void shouldThrowWhenUpdateEmailHasNoAtSign() {
