@@ -44,13 +44,28 @@ public class FilmController {
         if (!films.containsKey(newFilm.getId())) {
             throw new NotFoundException("Фильм с id = " + newFilm.getId() + " не найден");
         }
-        validate(newFilm);
+        validateUpdate(newFilm);
         Film oldFilm = films.get(newFilm.getId());
         if (newFilm.getName() != null) oldFilm.setName(newFilm.getName());
         if (newFilm.getDescription() != null) oldFilm.setDescription(newFilm.getDescription());
         if (newFilm.getReleaseDate() != null) oldFilm.setReleaseDate(newFilm.getReleaseDate());
         if (newFilm.getDuration() > ZERO) oldFilm.setDuration(newFilm.getDuration());
         return oldFilm;
+    }
+
+    private void validateUpdate(Film film) {
+        if (film.getName() != null && film.getName().isBlank()) {
+            throw new ConditionsNotMetException("Название не может быть пустым");
+        }
+        if (film.getDescription() != null && film.getDescription().length() > MAX_DESCRIPTION_LENGTH) {
+            throw new ConditionsNotMetException("Максимальная длина описания — 200 символов");
+        }
+        if (film.getReleaseDate() != null && film.getReleaseDate().isBefore(CINEMA_BIRTHDAY)) {
+            throw new ConditionsNotMetException("Дата релиза не может быть раньше 28 декабря 1895 года");
+        }
+        if (film.getDuration() <= ZERO) {
+            throw new ConditionsNotMetException("Продолжительность фильма должна быть положительным числом и больше нуля");
+        }
     }
 
     private void validate(Film film) {
@@ -67,6 +82,7 @@ public class FilmController {
             throw new ConditionsNotMetException("Продолжительность фильма должна быть положительным числом и больше нуля");
         }
     }
+
 
     private long getNextId() {
         return films.keySet().stream().mapToLong(id -> id).max().orElse(0) + 1;
