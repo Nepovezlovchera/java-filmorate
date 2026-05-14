@@ -28,6 +28,7 @@ public class FilmControllerTest {
         film.setDuration(duration);
         return film;
     }
+
     //createFilm
     @Test
     void shouldCreateFilmSuccessfully() {
@@ -90,6 +91,7 @@ public class FilmControllerTest {
         Film film = makeFilmForTest("Название", "Описание", LocalDate.of(2000, 1, 1), 1);
         assertDoesNotThrow(() -> controller.createFilm(film));
     }
+
     //update
     @Test
     void shouldThrowWhenUpdateWithoutId() {
