@@ -27,8 +27,8 @@ public class UserService {
     }
 
     public User findByIdUser(long id) {
-        return userStorage.findById(id).
-                orElseThrow(() -> new NotFoundException("Пользователь с id = " + id + " не найден"));
+        return userStorage.findById(id)
+                .orElseThrow(() -> new NotFoundException("Пользователь с id = " + id + " не найден"));
     }
 
     public Collection<User> getAllFriends(long userId) {
@@ -41,8 +41,8 @@ public class UserService {
     public Collection<User> getCommonFriends(long userId, long otherId) {
         User user = findByIdUser(userId);
         User other = findByIdUser(otherId);
-        return user.getFriends().stream().
-                filter(other.getFriends()::contains)
+        return user.getFriends().stream()
+                .filter(other.getFriends()::contains)
                 .map(this::findByIdUser)
                 .collect(Collectors.toList());
     }
