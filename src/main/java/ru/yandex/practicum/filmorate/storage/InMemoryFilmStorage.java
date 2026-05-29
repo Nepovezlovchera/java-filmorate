@@ -27,7 +27,6 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Film createFilm(Film film) {
-        validate(film);
         film.setId(getNextId());
         films.put(film.getId(), film);
         return film;
@@ -41,7 +40,6 @@ public class InMemoryFilmStorage implements FilmStorage {
         if (!films.containsKey(newFilm.getId())) {
             throw new NotFoundException("Фильм с id = " + newFilm.getId() + " не найден");
         }
-        validateUpdate(newFilm);
         Film oldFilm = films.get(newFilm.getId());
         if (newFilm.getName() != null) oldFilm.setName(newFilm.getName());
         if (newFilm.getDescription() != null) oldFilm.setDescription(newFilm.getDescription());
@@ -55,35 +53,6 @@ public class InMemoryFilmStorage implements FilmStorage {
         return Optional.ofNullable(films.get(id));
     }
 
-    private void validateUpdate(Film film) {
-        if (film.getName() != null && film.getName().isBlank()) {
-            throw new ConditionsNotMetException("Название не может быть пустым");
-        }
-        if (film.getDescription() != null && film.getDescription().length() > MAX_DESCRIPTION_LENGTH) {
-            throw new ConditionsNotMetException("Максимальная длина описания — 200 символов");
-        }
-        if (film.getReleaseDate() != null && film.getReleaseDate().isBefore(CINEMA_BIRTHDAY)) {
-            throw new ConditionsNotMetException("Дата релиза не может быть раньше 28 декабря 1895 года");
-        }
-        if (film.getDuration() <= ZERO) {
-            throw new ConditionsNotMetException("Продолжительность фильма должна быть положительным числом и больше нуля");
-        }
-    }
-
-    private void validate(Film film) {
-        if (film.getName() == null || film.getName().isBlank()) {
-            throw new ConditionsNotMetException("Название не может быть пустым");
-        }
-        if (film.getDescription() != null && film.getDescription().length() > MAX_DESCRIPTION_LENGTH) {
-            throw new ConditionsNotMetException("Максимальная длина описания — 200 символов");
-        }
-        if (film.getReleaseDate() != null && film.getReleaseDate().isBefore(CINEMA_BIRTHDAY)) {
-            throw new ConditionsNotMetException("Дата релиза не может быть раньше 28 декабря 1895 года");
-        }
-        if (film.getDuration() <= ZERO) {
-            throw new ConditionsNotMetException("Продолжительность фильма должна быть положительным числом и больше нуля");
-        }
-    }
 
 
     private long getNextId() {
