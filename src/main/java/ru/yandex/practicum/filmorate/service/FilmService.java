@@ -1,20 +1,32 @@
 package ru.yandex.practicum.filmorate.service;
 
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.LikeDbStorage;
 
 import java.util.Collection;
 import java.util.stream.Collectors;
 
+@Qualifier
 @Service
-@RequiredArgsConstructor
 public class FilmService {
+
     private final UserService userService;
     private final FilmStorage filmStorage;
+    private final LikeDbStorage likeDbStorage;
+
+    public FilmService(
+            @Qualifier("filmDbStorage") FilmStorage filmStorage,   // ← важно
+            LikeDbStorage likeDbStorage,
+            UserService userService) {
+
+        this.filmStorage = filmStorage;
+        this.likeDbStorage = likeDbStorage;
+        this.userService = userService;
+    }
 
     public Collection<Film> getFilms() {
         return filmStorage.getFilms();
@@ -28,27 +40,28 @@ public class FilmService {
         return filmStorage.updateFilm(film);
     }
 
-    public User findByIdUser(long id) {
-        return userService.findByIdUser(id);
-    }
-
     public Film findByIdFilm(long id) {
-        return filmStorage.findById(id).orElseThrow(() -> new NotFoundException("Фильм с id = " + id + " не найден"));
-    }
-
-    public Collection<Film> getPopular(int count) {
-        return filmStorage.getFilms().stream().sorted((film1, film2) -> film2.getLikes().size() - film1.getLikes().size()).limit(count).collect(Collectors.toList());
+        return filmStorage.findById(id)
+                .orElseThrow(() -> new NotFoundException("Фильм с id = " + id + " не найден"));
     }
 
     public void addLike(long filmId, long userId) {
-        Film film = findByIdFilm(filmId);
-        findByIdUser(userId);
-        film.getLikes().add(userId);
+        findByIdFilm(filmId);
+        userService.findByIdUser(userId);
+        likeDbStorage.create(userId, filmId);
     }
 
     public void removeLike(long filmId, long userId) {
-        Film film = findByIdFilm(filmId);
-        findByIdUser(userId);
-        film.getLikes().remove(userId);
+        findByIdFilm(filmId);
+        userService.findByIdUser(userId);
+    }
+
+    public Collection<Film> getPopular(int count) {
+        return filmStorage.getFilms().stream()
+                .sorted((f1, f2) -> Long.compare(
+                        likeDbStorage.countLikes(f2.getId()),
+                        likeDbStorage.countLikes(f1.getId())))
+                .limit(count)
+                .collect(Collectors.toList());
     }
 }

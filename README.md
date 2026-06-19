@@ -2,7 +2,7 @@
 Template repository for Filmorate project.
 
 Схема реляционной базы данных для filmorate.
-![img_1.png](img_1.png)
+![img.png](ER Diagram.png)
 
 Для данной БД можно использовать такие запросы:
 Для Film:
