@@ -12,11 +12,7 @@ public class LikeDbStorage extends BaseStorage<Like> {
 
     private final FilmDbStorage filmDbStorage;
 
-    private static final String CREATE_LIKE = """
-            INSERT INTO likes (user_id, film_id) 
-            VALUES (?, ?)
-            """;
-
+    private static final String CREATE_LIKE = "INSERT INTO likes (user_id, film_id) VALUES (?, ?)";
     private static final String FIND_BY_FILM_ID = "SELECT * FROM likes WHERE film_id = ?";
     private static final String COUNT_LIKES = "SELECT COUNT(*) FROM likes WHERE film_id = ?";
 
