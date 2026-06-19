@@ -24,14 +24,14 @@ import java.util.Set;
 public class FilmController {
 
     private final FilmService filmService;
-    private final MpaDbStorage mpaDbStorage;
-    private final GenreDbStorage genreDbStorage;
+    private MpaDbStorage mpaDbStorage;
+    private GenreDbStorage genreDbStorage;
 
     @Autowired
     public FilmController(FilmService filmService, MpaDbStorage mpaDbStorage, GenreDbStorage genreDbStorage) {
         this.filmService = filmService;
-        this.mpaDbStorage = mpaDbStorage;
-        this.genreDbStorage = genreDbStorage;
+        this.mpaDbStorage = this.mpaDbStorage;
+        this.genreDbStorage = this.genreDbStorage;
     }
 
     @GetMapping

@@ -15,7 +15,7 @@ import java.util.Optional;
 @Repository("userDbStorage")
 public class UserDbStorage extends BaseStorage<User> implements UserStorage {
     private static final String GET_USERS = "SELECT * FROM users";
-    private static final String CREATE_USER = "INSERT INTO users(user_name,email, login, birthday) " +
+    private static final String CREATE_USER = "INSERT INTO users(user_name, email, login, birthday) " +
             "VALUES (?, ?, ?, ?)";
     private static final String UPDATE_USER = "UPDATE users  SET user_name = ?, email = ?, login = ?," +
             " birthday = ? WHERE user_id = ?";
@@ -27,12 +27,12 @@ public class UserDbStorage extends BaseStorage<User> implements UserStorage {
 
     @Override
     public Collection<User> getUsers() {
-    return findMany(GET_USERS);
+        return findMany(GET_USERS);
     }
 
     @Override
     public User createUser(User user) {
-        long id =insert(
+        long id = insert(
                 CREATE_USER,
                 user.getName(),
                 user.getEmail(),
