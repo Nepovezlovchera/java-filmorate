@@ -1,3 +1,5 @@
+DELETE FROM genre;
+
 -- Добавляем рейтинги MPA (американская система)
 INSERT INTO mpa (mpa_name) VALUES ('G');
 INSERT INTO mpa (mpa_name) VALUES ('PG');
