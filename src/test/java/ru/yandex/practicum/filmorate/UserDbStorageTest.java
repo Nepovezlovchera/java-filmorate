@@ -104,4 +104,39 @@ public class UserDbStorageTest {
 
         assertThat(users).hasSizeGreaterThanOrEqualTo(2);
     }
+
+    @Test
+    void testCreateUserWithMinimalFields() {
+        User user = new User();
+        user.setEmail("minimal@mail.ru");
+        user.setLogin("minimalLogin");
+        user.setBirthday(LocalDate.of(2000, 1, 1));
+
+        User created = userStorage.createUser(user);
+        assertThat(created.getId()).isNotNull();
+        assertThat(created.getEmail()).isEqualTo("minimal@mail.ru");
+        assertThat(created.getLogin()).isEqualTo("minimalLogin");
+        assertThat(created.getName()).isNull();
+    }
+
+    @Test
+    void testUpdateUserWithNullFields() {
+        User user = new User();
+        user.setEmail("update@mail.ru");
+        user.setLogin("updateLogin");
+        user.setName("Update Name");
+        user.setBirthday(LocalDate.of(1990, 1, 1));
+        User created = userStorage.createUser(user);
+
+        created.setName(null);
+        User updated = userStorage.updateUser(created);
+
+        assertThat(updated.getName()).isNull();
+    }
+
+    @Test
+    void testFindAllUsersEmpty() {
+        Collection<User> users = userStorage.getUsers();
+        assertThat(users).isNotNull();
+    }
 }

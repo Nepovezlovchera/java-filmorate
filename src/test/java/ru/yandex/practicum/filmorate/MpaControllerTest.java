@@ -50,4 +50,44 @@ class MpaControllerTest {
             mpaController.getMpaById(999L);
         });
     }
+
+    @Test
+    void shouldGetAllMpaOrdered() {
+        List<Mpa> mpaList = mpaController.getMpa();
+
+        assertThat(mpaList)
+                .isSortedAccordingTo((m1, m2) -> m1.getId().compareTo(m2.getId()));
+    }
+
+    @Test
+    void shouldGetMpaByIdWithInvalidId() {
+        assertThrows(RuntimeException.class, () -> {
+            mpaController.getMpaById(-1L);
+        });
+    }
+
+    @Test
+    void shouldGetMpaByIdWithNull() {
+        assertThrows(RuntimeException.class, () -> {
+            mpaController.getMpaById(null);
+        });
+    }
+
+    @Test
+    void shouldGetAllMpaContainsExpectedNames() {
+        List<Mpa> mpaList = mpaController.getMpa();
+
+        assertThat(mpaList)
+                .extracting(Mpa::getName)
+                .containsExactly("G", "PG", "PG-13", "R", "NC-17");
+    }
+
+    @Test
+    void shouldGetAllMpaIdsUnique() {
+        List<Mpa> mpaList = mpaController.getMpa();
+
+        assertThat(mpaList)
+                .extracting(Mpa::getId)
+                .doesNotHaveDuplicates();
+    }
 }

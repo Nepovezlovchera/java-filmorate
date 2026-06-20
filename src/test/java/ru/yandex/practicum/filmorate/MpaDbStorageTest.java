@@ -47,4 +47,38 @@ public class MpaDbStorageTest {
         Optional<Mpa> mpa = mpaDbStorage.findById(999L);
         assertThat(mpa).isEmpty();
     }
+
+    @Test
+    void testFindAllMpaOrdered() {
+        List<Mpa> mpaList = mpaDbStorage.findAll();
+        assertThat(mpaList).isSortedAccordingTo((m1, m2) -> m1.getId().compareTo(m2.getId()));
+    }
+
+    @Test
+    void testFindMpaByIdWithInvalidId() {
+        Optional<Mpa> mpa = mpaDbStorage.findById(-1L);
+        assertThat(mpa).isEmpty();
+    }
+
+    @Test
+    void testFindAllMpaContainsExpectedNames() {
+        List<Mpa> mpaList = mpaDbStorage.findAll();
+        assertThat(mpaList)
+                .extracting(Mpa::getName)
+                .containsExactly("G", "PG", "PG-13", "R", "NC-17");
+    }
+
+    @Test
+    void testFindAllMpaIdsUnique() {
+        List<Mpa> mpaList = mpaDbStorage.findAll();
+        assertThat(mpaList)
+                .extracting(Mpa::getId)
+                .doesNotHaveDuplicates();
+    }
+
+    @Test
+    void testFindMpaByIdWithNull() {
+        Optional<Mpa> mpa = mpaDbStorage.findById(null);
+        assertThat(mpa).isEmpty();
+    }
 }
