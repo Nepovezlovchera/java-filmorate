@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate;
 
 import lombok.RequiredArgsConstructor;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -24,6 +25,22 @@ import static org.assertj.core.api.Assertions.assertThat;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class FilmDbStorageTest {
     private final FilmDbStorage filmStorage;
+    private Long testFilmId;
+
+    @BeforeEach
+    void setUp() {
+        Film film = new Film();
+        film.setName("Test Film");
+        film.setDescription("Test Description");
+        film.setReleaseDate(LocalDate.of(2020, 1, 1));
+        film.setDuration(120);
+        Mpa mpa = new Mpa();
+        mpa.setId(1L);
+        film.setMpa(mpa);
+
+        Film created = filmStorage.createFilm(film);
+        testFilmId = created.getId();
+    }
 
     @Test
     void testCreateFilm() {
@@ -48,20 +65,13 @@ public class FilmDbStorageTest {
 
     @Test
     void testFindFilmById() {
-        Film film = new Film();
-        film.setName("Find Film");
-        film.setDescription("Find Description");
-        film.setReleaseDate(LocalDate.of(2020, 1, 1));
-        film.setDuration(120);
-        Mpa mpa = new Mpa();
-        mpa.setId(1L);
-        film.setMpa(mpa);
-        Film created = filmStorage.createFilm(film);
-
-        Optional<Film> found = filmStorage.findById(created.getId());
+        Optional<Film> found = filmStorage.findById(testFilmId);
 
         assertThat(found).isPresent();
-        assertThat(found.get().getName()).isEqualTo("Find Film");
+        assertThat(found.get().getName()).isEqualTo("Test Film");
+        assertThat(found.get().getDescription()).isEqualTo("Test Description");
+        assertThat(found.get().getReleaseDate()).isEqualTo(LocalDate.of(2020, 1, 1));
+        assertThat(found.get().getDuration()).isEqualTo(120);
     }
 
     @Test
@@ -72,22 +82,16 @@ public class FilmDbStorageTest {
 
     @Test
     void testUpdateFilm() {
-        Film film = new Film();
-        film.setName("Old Film");
-        film.setDescription("Old Description");
-        film.setReleaseDate(LocalDate.of(2020, 1, 1));
-        film.setDuration(120);
-        Mpa mpa = new Mpa();
-        mpa.setId(1L);
-        film.setMpa(mpa);
-        Film created = filmStorage.createFilm(film);
+        Optional<Film> filmOpt = filmStorage.findById(testFilmId);
+        assertThat(filmOpt).isPresent();
 
-        created.setName("New Film");
-        created.setDescription("New Description");
-        created.setReleaseDate(LocalDate.of(2021, 2, 2));
-        created.setDuration(150);
+        Film film = filmOpt.get();
+        film.setName("New Film");
+        film.setDescription("New Description");
+        film.setReleaseDate(LocalDate.of(2021, 2, 2));
+        film.setDuration(150);
 
-        Film updated = filmStorage.updateFilm(created);
+        Film updated = filmStorage.updateFilm(film);
 
         assertThat(updated.getName()).isEqualTo("New Film");
         assertThat(updated.getDescription()).isEqualTo("New Description");
@@ -97,22 +101,13 @@ public class FilmDbStorageTest {
 
     @Test
     void testGetFilms() {
-        Film film1 = new Film();
-        film1.setName("Film One");
-        film1.setDescription("Description One");
-        film1.setReleaseDate(LocalDate.of(2020, 1, 1));
-        film1.setDuration(120);
-        Mpa mpa = new Mpa();
-        mpa.setId(1L);
-        film1.setMpa(mpa);
-        filmStorage.createFilm(film1);
-
+        // В setUp уже создан один фильм, создаем еще один
         Film film2 = new Film();
         film2.setName("Film Two");
         film2.setDescription("Description Two");
         film2.setReleaseDate(LocalDate.of(2021, 2, 2));
         film2.setDuration(150);
-        mpa = new Mpa();
+        Mpa mpa = new Mpa();
         mpa.setId(2L);
         film2.setMpa(mpa);
         filmStorage.createFilm(film2);
