@@ -1,11 +1,3 @@
-DELETE FROM film_genres;
-DELETE FROM films;
-DELETE FROM likes;
-DELETE FROM friends;
-DELETE FROM users;
-DELETE FROM genre;
-DELETE FROM mpa;
-
 -- Добавляем рейтинги MPA (американская система)
 INSERT INTO mpa (mpa_name) VALUES ('G');
 INSERT INTO mpa (mpa_name) VALUES ('PG');

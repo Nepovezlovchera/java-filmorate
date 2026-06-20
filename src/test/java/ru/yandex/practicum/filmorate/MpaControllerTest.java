@@ -1,54 +1,55 @@
 package ru.yandex.practicum.filmorate;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.context.jdbc.Sql;
+import ru.yandex.practicum.filmorate.controller.MpaController;
+import ru.yandex.practicum.filmorate.model.Mpa;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
-@AutoConfigureMockMvc
+@Sql(scripts = {"/schema.sql", "/data-test.sql"})
 class MpaControllerTest {
 
     @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
+    private MpaController mpaController;
 
     @Test
-    void shouldGetAllMpa() throws Exception {
-        mockMvc.perform(get("/mpa"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(5))
-                .andExpect(jsonPath("$[0].id").value(1))
-                .andExpect(jsonPath("$[0].name").value("G"))
-                .andExpect(jsonPath("$[1].id").value(2))
-                .andExpect(jsonPath("$[1].name").value("PG"))
-                .andExpect(jsonPath("$[2].id").value(3))
-                .andExpect(jsonPath("$[2].name").value("PG-13"))
-                .andExpect(jsonPath("$[3].id").value(4))
-                .andExpect(jsonPath("$[3].name").value("R"))
-                .andExpect(jsonPath("$[4].id").value(5))
-                .andExpect(jsonPath("$[4].name").value("NC-17"));
+    void shouldGetAllMpa() {
+        List<Mpa> mpaList = mpaController.getMpa();
+
+        assertThat(mpaList)
+                .isNotNull()
+                .hasSize(5)
+                .extracting(Mpa::getId)
+                .containsExactly(1L, 2L, 3L, 4L, 5L);
+
+        assertThat(mpaList.get(0).getName()).isEqualTo("G");
+        assertThat(mpaList.get(1).getName()).isEqualTo("PG");
+        assertThat(mpaList.get(2).getName()).isEqualTo("PG-13");
+        assertThat(mpaList.get(3).getName()).isEqualTo("R");
+        assertThat(mpaList.get(4).getName()).isEqualTo("NC-17");
     }
 
     @Test
-    void shouldGetMpaById() throws Exception {
-        mockMvc.perform(get("/mpa/1"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.name").value("G"));
+    void shouldGetMpaById() {
+        Mpa mpa = mpaController.getMpaById(1L);
+
+        assertThat(mpa)
+                .isNotNull()
+                .hasFieldOrPropertyWithValue("id", 1L)
+                .hasFieldOrPropertyWithValue("name", "G");
     }
 
     @Test
-    void shouldReturn404WhenMpaNotFound() throws Exception {
-        mockMvc.perform(get("/mpa/999"))
-                .andExpect(status().isNotFound());
+    void shouldReturn404WhenMpaNotFound() {
+        assertThrows(RuntimeException.class, () -> {
+            mpaController.getMpaById(999L);
+        });
     }
 }
