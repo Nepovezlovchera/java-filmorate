@@ -11,9 +11,9 @@ import java.util.Optional;
 
 @Repository
 public class GenreDbStorage extends BaseStorage<Genre> {
-    private static final String FIND_ALL = "SELECT * FROM genre";
+    private static final String FIND_ALL = "SELECT * FROM genre ORDER BY genre_id";
     private static final String CREATE_GENRE = "INSERT INTO genre(genre_name) VALUES(?)";
-    private static final String UPDATE_GENRE = "UPDATE genre  SET genre_name = ?";
+    private static final String UPDATE_GENRE = "UPDATE genre SET genre_name = ? WHERE genre_id = ?";
     private static final String FIND_BY_ID = "SELECT * FROM genre WHERE genre_id = ?";
 
     public GenreDbStorage(JdbcTemplate jdbc, GenreRowMapper mapper) {
@@ -25,26 +25,17 @@ public class GenreDbStorage extends BaseStorage<Genre> {
     }
 
     public Genre createGenre(Genre genre) throws InternalServerException {
-        Long id = insert(
-                CREATE_GENRE,
-                genre.getName()
-        );
+        Long id = insert(CREATE_GENRE, genre.getName());
         genre.setId(id);
-
         return genre;
     }
 
     public Genre updateGenre(Genre newGenre) {
-        update(
-                UPDATE_GENRE,
-                newGenre.getName(),
-                newGenre.getId()
-        );
+        update(UPDATE_GENRE, newGenre.getName(), newGenre.getId());
         return newGenre;
     }
 
     public Optional<Genre> findByIdGenre(Long id) {
         return findOne(FIND_BY_ID, id);
     }
-
 }

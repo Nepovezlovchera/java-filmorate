@@ -10,7 +10,7 @@ import java.util.Optional;
 
 @Repository
 public class MpaDbStorage extends BaseStorage<Mpa> {
-    private static final String FIND_ALL = "SELECT * FROM mpa";
+    private static final String FIND_ALL = "SELECT * FROM mpa WHERE mpa_id BETWEEN 1 AND 5 ORDER BY mpa_id";
     private static final String FIND_BY_ID = "SELECT * FROM mpa WHERE mpa_id = ?";
 
     public MpaDbStorage(JdbcTemplate jdbc, MpaRowMapper mapper) {

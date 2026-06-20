@@ -45,11 +45,15 @@ public class FriendsDbStorage extends BaseStorage<Friends> {
     }
 
     public void addFriend(long userId, long friendId) {
+        if (userId == friendId) {
+            return;
+        }
+
         boolean reverseExists = checkFriendship(friendId, userId);
 
         if (reverseExists) {
             jdbc.update(ADD_FRIEND, userId, friendId, STATUS_CONFIRMED);
-            jdbc.update(UPDATE_FRIEND_STATUS, STATUS_CONFIRMED, friendId, userId);
+            updateFriendStatus(friendId, userId, STATUS_CONFIRMED);
         } else {
             jdbc.update(ADD_FRIEND, userId, friendId, STATUS_UNCONFIRMED);
         }
