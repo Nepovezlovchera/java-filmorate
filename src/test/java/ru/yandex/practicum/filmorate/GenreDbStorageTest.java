@@ -19,7 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @JdbcTest
 @AutoConfigureTestDatabase
 @Import({GenreDbStorage.class, GenreRowMapper.class})
-@Sql(scripts = {"/schema.sql", "/data-test.sql"})
+@Sql(scripts = {"/schema.sql", "/data.sql"})
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class GenreDbStorageTest {
     private final GenreDbStorage genreDbStorage;

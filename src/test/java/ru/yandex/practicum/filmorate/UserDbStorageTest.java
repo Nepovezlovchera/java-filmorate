@@ -20,7 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @JdbcTest
 @AutoConfigureTestDatabase
 @Import({UserDbStorage.class, UserRowMapper.class})
-@Sql(scripts = {"/schema.sql", "/data-test.sql"})
+@Sql(scripts = {"/schema.sql", "/data.sql"})
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class UserDbStorageTest {
     private final UserDbStorage userStorage;

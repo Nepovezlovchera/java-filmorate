@@ -22,7 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @JdbcTest
 @AutoConfigureTestDatabase
 @Import({FriendsDbStorage.class, FriendsRowMapper.class, UserRowMapper.class, UserDbStorage.class})
-@Sql(scripts = {"/schema.sql", "/data-test.sql"})
+@Sql(scripts = {"/schema.sql", "/data.sql"})
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class FriendsDbStorageTest {
     private final FriendsDbStorage friendsDbStorage;

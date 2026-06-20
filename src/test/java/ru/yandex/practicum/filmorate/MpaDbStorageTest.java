@@ -19,7 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @JdbcTest
 @AutoConfigureTestDatabase
 @Import({MpaDbStorage.class, MpaRowMapper.class})
-@Sql(scripts = {"/schema.sql", "/data-test.sql"})
+@Sql(scripts = {"/schema.sql", "/data.sql"})
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class MpaDbStorageTest {
     private final MpaDbStorage mpaDbStorage;

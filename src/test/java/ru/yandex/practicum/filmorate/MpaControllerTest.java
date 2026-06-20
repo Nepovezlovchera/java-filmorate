@@ -13,7 +13,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
-@Sql(scripts = {"/schema.sql", "/data-test.sql"})
+@Sql(scripts = {"/schema.sql", "/data.sql"})
 class MpaControllerTest {
 
     @Autowired

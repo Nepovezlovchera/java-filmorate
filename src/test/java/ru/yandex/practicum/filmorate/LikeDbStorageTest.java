@@ -27,7 +27,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @AutoConfigureTestDatabase
 @Import({LikeDbStorage.class, LikeRowMapper.class, UserDbStorage.class, UserRowMapper.class,
         FilmDbStorage.class, FilmRowMapper.class, FilmGenresStorage.class})
-@Sql(scripts = {"/schema.sql", "/data-test.sql"})
+@Sql(scripts = {"/schema.sql", "/data.sql"})
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class LikeDbStorageTest {
     private final LikeDbStorage likeDbStorage;

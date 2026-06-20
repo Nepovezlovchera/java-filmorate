@@ -25,7 +25,7 @@ import java.util.Set;
 @AutoConfigureTestDatabase
 @Import({FilmGenresStorage.class, FilmDbStorage.class, FilmRowMapper.class,
         GenreRowMapper.class, GenreDbStorage.class})
-@Sql(scripts = {"/schema.sql", "/data-test.sql"})
+@Sql(scripts = {"/schema.sql", "/data.sql"})
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class FilmGenresStorageTest {
     private final FilmGenresStorage filmGenresStorage;
