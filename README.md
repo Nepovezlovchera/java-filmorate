@@ -39,4 +39,4 @@ Template repository for Filmorate project.
    SELECT *
    FROM Users
    WHERE user_id = {введите id};
-   ```
+   ``` 
