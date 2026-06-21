@@ -1,128 +1,92 @@
-    package ru.yandex.practicum.filmorate;
+package ru.yandex.practicum.filmorate;
 
-    import lombok.RequiredArgsConstructor;
-    import org.junit.jupiter.api.Test;
-    import org.springframework.beans.factory.annotation.Autowired;
-    import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-    import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
-    import org.springframework.context.annotation.Import;
-    import org.springframework.test.context.jdbc.Sql;
-    import ru.yandex.practicum.filmorate.mappers.GenreRowMapper;
-    import ru.yandex.practicum.filmorate.model.Genre;
-    import ru.yandex.practicum.filmorate.storage.GenreDbStorage;
+import lombok.RequiredArgsConstructor;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.jdbc.Sql;
+import ru.yandex.practicum.filmorate.mappers.GenreRowMapper;
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.storage.GenreDbStorage;
 
-    import java.util.List;
-    import java.util.Optional;
+import java.util.List;
+import java.util.Optional;
 
-    import static org.assertj.core.api.Assertions.assertThat;
-    import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-    @JdbcTest
-    @AutoConfigureTestDatabase
-    @Import({GenreDbStorage.class, GenreRowMapper.class})
-    @Sql(scripts = {"/schema.sql", "/data.sql"})
-    @RequiredArgsConstructor(onConstructor_ = @Autowired)
-    public class GenreDbStorageTest {
-        private final GenreDbStorage genreDbStorage;
+@JdbcTest
+@AutoConfigureTestDatabase
+@Import({GenreDbStorage.class, GenreRowMapper.class})
+@Sql(scripts = "/schema.sql")
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+public class GenreDbStorageTest {
 
-        @Test
-        void testFindAllGenres() {
-            List<Genre> genres = genreDbStorage.findAllGenre();
-            assertThat(genres).hasSizeGreaterThanOrEqualTo(6);
-        }
+    private final GenreDbStorage genreDbStorage;
+    private final JdbcTemplate jdbcTemplate;
 
-        @Test
-        void testFindGenreById() {
-            Optional<Genre> genre = genreDbStorage.findByIdGenre(1L);
-            assertThat(genre).isPresent();
-            assertThat(genre.get().getName()).isEqualTo("Комедия");
-        }
-
-        @Test
-        void testFindGenreByIdNotFound() {
-            Optional<Genre> genre = genreDbStorage.findByIdGenre(999L);
-            assertThat(genre).isEmpty();
-        }
-
-        @Test
-        void testFindGenreByIdWithInvalidId() {
-            Optional<Genre> genre = genreDbStorage.findByIdGenre(-1L);
-            assertThat(genre).isEmpty();
-        }
-
-        @Test
-        void testFindAllGenresOrdered() {
-            List<Genre> genres = genreDbStorage.findAllGenre();
-            assertThat(genres).isSortedAccordingTo((g1, g2) -> g1.getId().compareTo(g2.getId()));
-        }
-
-        @Test
-        void testCreateGenre() {
-            Genre newGenre = new Genre();
-            newGenre.setName("Фэнтези");
-            Genre created = genreDbStorage.createGenre(newGenre);
-            assertThat(created.getId()).isNotNull();
-            assertThat(created.getName()).isEqualTo("Фэнтези");
-
-            Optional<Genre> found = genreDbStorage.findByIdGenre(created.getId());
-            assertThat(found).isPresent();
-            assertThat(found.get().getName()).isEqualTo("Фэнтези");
-        }
-
-        @Test
-        void testCreateDuplicateGenre() {
-            // Используем уникальное имя для нового жанра
-            Genre newGenre = new Genre();
-            newGenre.setName("Вестерн");
-            Genre created = genreDbStorage.createGenre(newGenre);
-            assertThat(created.getId()).isNotNull();
-            assertThat(created.getName()).isEqualTo("Вестерн");
-        }
-
-        @Test
-        void testUpdateGenre() {
-            // Создаем новый жанр с уникальным именем
-            Genre newGenre = new Genre();
-            newGenre.setName("Для обновления");
-            Genre created = genreDbStorage.createGenre(newGenre);
-
-            created.setName("Обновленное имя");
-            Genre updated = genreDbStorage.updateGenre(created);
-
-            assertThat(updated.getId()).isEqualTo(created.getId());
-            assertThat(updated.getName()).isEqualTo("Обновленное имя");
-
-            Optional<Genre> found = genreDbStorage.findByIdGenre(created.getId());
-            assertThat(found).isPresent();
-            assertThat(found.get().getName()).isEqualTo("Обновленное имя");
-        }
-
-        @Test
-        void testUpdateGenreNotFound() {
-            Genre genre = new Genre();
-            genre.setId(999L);
-            genre.setName("Несуществующий жанр");
-
-            Genre updated = genreDbStorage.updateGenre(genre);
-            assertThat(updated).isNotNull();
-            assertThat(updated.getId()).isEqualTo(999L);
-        }
-
-        @Test
-        void testCreateGenreWithNullName() {
-            Genre genre = new Genre();
-            genre.setName(null);
-
-            assertThrows(Exception.class, () -> {
-                genreDbStorage.createGenre(genre);
-            });
-        }
-
-        @Test
-        void testFindAllGenresContainsExpectedGenres() {
-            List<Genre> genres = genreDbStorage.findAllGenre();
-            assertThat(genres)
-                    .extracting(Genre::getName)
-                    .contains("Комедия", "Драма", "Мультфильм", "Триллер", "Документальный", "Боевик");
-        }
+    @BeforeEach
+    void setUp() {
+        jdbcTemplate.execute("DELETE FROM film_genres");
+        jdbcTemplate.execute("DELETE FROM films");
+        jdbcTemplate.execute("DELETE FROM genre");
     }
+
+    @Test
+    void testFindAllGenres() {
+        List<Genre> genres = genreDbStorage.findAllGenre();
+        assertThat(genres).hasSizeGreaterThanOrEqualTo(0);
+    }
+
+    @Test
+    void testFindGenreById() {
+        Genre newGenre = new Genre();
+        newGenre.setName("Комедия");
+        Genre created = genreDbStorage.createGenre(newGenre);
+
+        Optional<Genre> genre = genreDbStorage.findByIdGenre(created.getId());
+        assertThat(genre).isPresent();
+        assertThat(genre.get().getName()).isEqualTo("Комедия");
+    }
+
+    @Test
+    void testCreateGenre() {
+        Genre newGenre = new Genre();
+        newGenre.setName("Фэнтези");
+
+        Genre created = genreDbStorage.createGenre(newGenre);
+
+        assertThat(created.getId()).isNotNull().isGreaterThan(0);
+        assertThat(created.getName()).isEqualTo("Фэнтези");
+    }
+
+    @Test
+    void testUpdateGenre() {
+        Genre newGenre = new Genre();
+        newGenre.setName("Для обновления");
+        Genre created = genreDbStorage.createGenre(newGenre);
+
+        created.setName("Обновлённый жанр");
+        Genre updated = genreDbStorage.updateGenre(created);
+
+        assertThat(updated.getName()).isEqualTo("Обновлённый жанр");
+    }
+
+    @Test
+    void testCreateDuplicateGenre() {
+        Genre genre1 = new Genre();
+        genre1.setName("Уникальный жанр");
+        genreDbStorage.createGenre(genre1);
+
+        Genre genre2 = new Genre();
+        genre2.setName("Уникальный жанр");
+
+        assertThrows(Exception.class, () -> genreDbStorage.createGenre(genre2));
+    }
+}

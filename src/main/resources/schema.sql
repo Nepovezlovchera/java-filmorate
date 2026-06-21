@@ -1,6 +1,6 @@
     CREATE TABLE IF NOT EXISTS genre (
         genre_id BIGINT AUTO_INCREMENT PRIMARY KEY,
-        genre_name VARCHAR(50) NOT NULL
+        genre_name VARCHAR(50) NOT NULL UNIQUE
     );
 
     CREATE TABLE IF NOT EXISTS mpa (
