@@ -17,9 +17,9 @@ public class FilmGenresStorage {
 
     private static final String REMOVE_ALL_GENRES = "DELETE FROM film_genres WHERE film_id = ?";
 
-    private static final String GET_GENRES_BY_FILM = "SELECT g.genre_id, g.genre_name " +
-            "FROM genre g JOIN film_genres fg ON g.genre_id = fg.genre_id " +
-            "WHERE fg.film_id = ? ORDER BY fg.genre_order";
+    private static final String GET_GENRES_BY_FILM = "SELECT g.genre_id, g.genre_name FROM genre g " +
+                    "JOIN film_genres fg ON g.genre_id = fg.genre_id " +
+                    "WHERE fg.film_id = ? ORDER BY g.genre_id";
 
     public FilmGenresStorage(JdbcTemplate jdbc) {
         this.jdbc = jdbc;
@@ -27,13 +27,9 @@ public class FilmGenresStorage {
 
     public void addGenres(long filmId, Set<Genre> genres) {
         if (genres == null || genres.isEmpty()) return;
-
         removeAllGenres(filmId);
-
-        int order = 0;
-        for (Genre genre : genres) {
-            jdbc.update(ADD_GENRE, filmId, genre.getId(), order++);
-        }
+        List<Genre> list = List.copyOf(genres);
+        jdbc.batchUpdate(ADD_GENRE, list, list.size(), (ps, g) -> { ps.setLong(1, filmId); ps.setLong(2, g.getId()); ps.setInt(3, list.indexOf(g)); });
     }
 
     public void removeAllGenres(long filmId) {

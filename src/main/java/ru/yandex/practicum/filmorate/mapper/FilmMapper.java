@@ -4,7 +4,6 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import ru.yandex.practicum.filmorate.dto.*;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -40,7 +39,7 @@ public class FilmMapper {
         dto.setMpa(film.getMpa());
 
         if (film.getGenres() != null) {
-            dto.setGenre((Genre) film.getGenres());
+            dto.setGenres(film.getGenres());
         }
 
         return dto;

@@ -6,6 +6,6 @@ import lombok.Data;
 @Data
 public class MpaDto {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private Long mpaId;
-    private String mpaName;
+    private Long id;
+    private String name;
 }

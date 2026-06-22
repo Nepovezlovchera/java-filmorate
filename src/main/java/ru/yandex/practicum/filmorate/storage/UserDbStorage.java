@@ -69,4 +69,5 @@ public class UserDbStorage extends BaseStorage<User> implements UserStorage {
     public Optional<User> findById(long id) {
         return findOne(FIND_BY_ID, id);
     }
+
 }

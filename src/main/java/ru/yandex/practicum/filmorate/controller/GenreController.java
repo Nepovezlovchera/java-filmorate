@@ -2,26 +2,25 @@ package ru.yandex.practicum.filmorate.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.storage.GenreDbStorage;
+import ru.yandex.practicum.filmorate.dto.GenreDto;
+import ru.yandex.practicum.filmorate.service.GenreService;
 
-import java.util.List;
+import java.util.Collection;
 
 @RestController
 @RequestMapping("/genres")
 @RequiredArgsConstructor
 public class GenreController {
-    private final GenreDbStorage genreDbStorage;
+
+    private final GenreService genreService;
 
     @GetMapping
-    public List<Genre> getGenres() {
-        return genreDbStorage.findAllGenre();
+    public Collection<GenreDto> getGenres() {
+        return genreService.getGenres();
     }
 
     @GetMapping("/{id}")
-    public Genre getGenreById(@PathVariable Long id) {
-        return genreDbStorage.findByIdGenre(id)
-                .orElseThrow(() -> new NotFoundException("Жанр с id = " + id + " не найден"));
+    public GenreDto getGenreById(@PathVariable Long id) {
+        return genreService.getGenreById(id);
     }
 }

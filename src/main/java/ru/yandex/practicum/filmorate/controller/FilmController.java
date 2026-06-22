@@ -2,21 +2,14 @@ package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.dto.FilmDto;
 import ru.yandex.practicum.filmorate.exception.ConditionsNotMetException;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.service.FilmService;
-import ru.yandex.practicum.filmorate.storage.GenreDbStorage;
-import ru.yandex.practicum.filmorate.storage.MpaDbStorage;
 
 import java.time.LocalDate;
 import java.util.Collection;
-import java.util.LinkedHashSet;
-import java.util.Set;
 
 @Slf4j
 @RestController
@@ -24,88 +17,34 @@ import java.util.Set;
 public class FilmController {
 
     private final FilmService filmService;
-    private MpaDbStorage mpaDbStorage;
-    private GenreDbStorage genreDbStorage;
 
-    @Autowired
-    public FilmController(FilmService filmService, MpaDbStorage mpaDbStorage, GenreDbStorage genreDbStorage) {
+    public FilmController(FilmService filmService) {
         this.filmService = filmService;
-        this.mpaDbStorage = mpaDbStorage;
-        this.genreDbStorage = genreDbStorage;
     }
 
     @GetMapping
-    public Collection<Film> getFilms() {
+    public Collection<FilmDto> getFilms() {
         return filmService.getFilms();
     }
 
     @GetMapping("/{id}")
-    public Film findById(@PathVariable long id) {
+    public FilmDto findById(@PathVariable long id) {
         return filmService.findByIdFilm(id);
     }
 
     @PostMapping
-    public Film createFilm(@Valid @RequestBody Film film) {
+    public FilmDto createFilm(@Valid @RequestBody Film film) {
         if (film.getReleaseDate() != null &&
                 film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
             throw new ConditionsNotMetException("Дата релиза не может быть раньше 28 декабря 1895 года");
         }
-
-        if (film.getMpa() == null || film.getMpa().getId() == null) {
-            throw new ConditionsNotMetException("Рейтинг MPA должен быть указан");
-        }
-
-        Mpa mpa = mpaDbStorage.findById(film.getMpa().getId())
-                .orElseThrow(() -> new NotFoundException("Рейтинг MPA с id = " + film.getMpa().getId() + " не найден"));
-        film.setMpa(mpa);
-
-        if (film.getGenres() != null && !film.getGenres().isEmpty()) {
-            Set<Genre> validGenres = new LinkedHashSet<>();  // ← LinkedHashSet
-            for (Genre genre : film.getGenres()) {
-                if (genre.getId() == null) {
-                    throw new ConditionsNotMetException("ID жанра должен быть указан");
-                }
-                Genre foundGenre = genreDbStorage.findByIdGenre(genre.getId())
-                        .orElseThrow(() -> new NotFoundException("Жанр с id = " + genre.getId() + " не найден"));
-                validGenres.add(foundGenre);
-            }
-            film.setGenres(validGenres);
-        } else {
-            film.setGenres(new LinkedHashSet<>());  // ← LinkedHashSet
-        }
-
-        validateFilm(film);
+        validate(film);
         return filmService.createFilm(film);
     }
 
     @PutMapping
-    public Film updateFilm(@RequestBody Film newFilm) {
-        if (newFilm.getId() == null) {
-            throw new ConditionsNotMetException("Id должен быть указан");
-        }
-
-        filmService.findByIdFilm(newFilm.getId());
-
-        if (newFilm.getMpa() != null && newFilm.getMpa().getId() != null) {
-            Mpa mpa = mpaDbStorage.findById(newFilm.getMpa().getId())
-                    .orElseThrow(() -> new NotFoundException("Рейтинг MPA с id = " + newFilm.getMpa().getId() + " не найден"));
-            newFilm.setMpa(mpa);
-        }
-
-        if (newFilm.getGenres() != null && !newFilm.getGenres().isEmpty()) {
-            Set<Genre> validGenres = new LinkedHashSet<>();  // ← LinkedHashSet
-            for (Genre genre : newFilm.getGenres()) {
-                if (genre.getId() == null) {
-                    throw new ConditionsNotMetException("ID жанра должен быть указан");
-                }
-                Genre foundGenre = genreDbStorage.findByIdGenre(genre.getId())
-                        .orElseThrow(() -> new NotFoundException("Жанр с id = " + genre.getId() + " не найден"));
-                validGenres.add(foundGenre);
-            }
-            newFilm.setGenres(validGenres);
-        }
-
-        validateUpdateFilm(newFilm);
+    public FilmDto updateFilm(@RequestBody Film newFilm) {
+        validateUpdate(newFilm);
         return filmService.updateFilm(newFilm);
     }
 
@@ -120,12 +59,11 @@ public class FilmController {
     }
 
     @GetMapping("/popular")
-    public Collection<Film> getPopular(@RequestParam(defaultValue = "10") int count) {
+    public Collection<FilmDto> getPopular(@RequestParam(defaultValue = "10") int count) {
         return filmService.getPopular(count);
     }
 
-    // ========== ВАЛИДАЦИЯ ДЛЯ FILM ==========
-    private void validateFilm(Film film) {
+    private void validate(Film film) {
         if (film.getName() == null || film.getName().isBlank()) {
             throw new ConditionsNotMetException("Название не может быть пустым");
         }
@@ -140,7 +78,7 @@ public class FilmController {
         }
     }
 
-    private void validateUpdateFilm(Film film) {
+    private void validateUpdate(Film film) {
         if (film.getName() != null && film.getName().isBlank()) {
             throw new ConditionsNotMetException("Название не может быть пустым");
         }

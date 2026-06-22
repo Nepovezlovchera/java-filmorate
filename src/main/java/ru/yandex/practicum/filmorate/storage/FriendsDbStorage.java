@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.mappers.UserRowMapper;
 import ru.yandex.practicum.filmorate.model.Friends;
 import ru.yandex.practicum.filmorate.model.User;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,9 +28,10 @@ public class FriendsDbStorage extends BaseStorage<Friends> {
             "WHERE f.user_id = ?";
     private static final String UPDATE_FRIEND_STATUS = "UPDATE friends SET status_id = ? WHERE user_id = ? " +
             "AND other_user_id = ?";
-    private static final String GET_GENRES_BY_FILM = "SELECT g.genre_id, g.genre_name " +
-            "FROM genre g JOIN film_genres fg ON g.genre_id = fg.genre_id " +
-            "WHERE fg.film_id = ? ORDER BY g.genre_id";
+    private static final String GET_COMMON_FRIENDS = "SELECT DISTINCT u.* FROM friends f1 " +
+            "JOIN friends f2 ON f1.other_user_id = f2.other_user_id JOIN users u ON u.user_id = f1.other_user_id " +
+            "WHERE f1.user_id = ? AND f2.user_id = ? " +
+            "ORDER BY u.user_id";
 
     public FriendsDbStorage(JdbcTemplate jdbc, FriendsRowMapper mapper, UserRowMapper userRowMapper) {
         super(jdbc, mapper);
@@ -78,5 +80,9 @@ public class FriendsDbStorage extends BaseStorage<Friends> {
 
     public void updateFriendStatus(long userId, long friendId, int statusId) {
         update(UPDATE_FRIEND_STATUS, statusId, userId, friendId);
+    }
+
+    public List<User> getCommonFriends(long userId, long otherId) {
+        return findManyWithMapper(GET_COMMON_FRIENDS, userRowMapper, userId, otherId);
     }
 }

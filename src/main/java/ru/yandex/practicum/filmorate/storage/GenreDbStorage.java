@@ -15,6 +15,7 @@ public class GenreDbStorage extends BaseStorage<Genre> {
     private static final String CREATE_GENRE = "INSERT INTO genre(genre_name) VALUES(?)";
     private static final String UPDATE_GENRE = "UPDATE genre SET genre_name = ? WHERE genre_id = ?";
     private static final String FIND_BY_ID = "SELECT * FROM genre WHERE genre_id = ?";
+    private static final String FIND_ALL_BY_IDS_TEMPLATE = "SELECT * FROM genre WHERE genre_id IN (%s) ORDER BY genre_id";
 
     public GenreDbStorage(JdbcTemplate jdbc, GenreRowMapper mapper) {
         super(jdbc, mapper);

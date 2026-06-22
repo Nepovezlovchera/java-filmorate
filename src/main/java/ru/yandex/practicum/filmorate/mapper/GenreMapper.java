@@ -18,8 +18,8 @@ public class GenreMapper {
 
     public static GenreDto mapToGenreDto(Genre genre) {
         GenreDto dto = new GenreDto();
-        dto.setGenreId(genre.getId());
-        dto.setGenreName(genre.getName());
+        dto.setId(genre.getId());
+        dto.setName(genre.getName());
 
         return dto;
     }

@@ -4,8 +4,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.controller.MpaController;
+import ru.yandex.practicum.filmorate.dto.MpaDto;
 import ru.yandex.practicum.filmorate.model.Mpa;
 
+import java.util.Collection;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -19,12 +21,12 @@ class MpaControllerTest {
 
     @Test
     void shouldGetAllMpa() {
-        List<Mpa> mpaList = mpaController.getMpa();
+        List<MpaDto> mpaList = mpaController.getMpa();
 
         assertThat(mpaList)
                 .isNotNull()
                 .hasSize(5)
-                .extracting(Mpa::getId)
+                .extracting(MpaDto::getId)
                 .containsExactly(1L, 2L, 3L, 4L, 5L);
 
         assertThat(mpaList.get(0).getName()).isEqualTo("G");
@@ -36,9 +38,9 @@ class MpaControllerTest {
 
     @Test
     void shouldGetMpaById() {
-        Mpa mpa = mpaController.getMpaById(1L);
+        MpaDto mpaDto = mpaController.getMpaById(1L);
 
-        assertThat(mpa)
+        assertThat(mpaDto)
                 .isNotNull()
                 .hasFieldOrPropertyWithValue("id", 1L)
                 .hasFieldOrPropertyWithValue("name", "G");
@@ -53,7 +55,7 @@ class MpaControllerTest {
 
     @Test
     void shouldGetAllMpaOrdered() {
-        List<Mpa> mpaList = mpaController.getMpa();
+        List<MpaDto> mpaList = mpaController.getMpa();
 
         assertThat(mpaList)
                 .isSortedAccordingTo((m1, m2) -> m1.getId().compareTo(m2.getId()));
@@ -75,19 +77,19 @@ class MpaControllerTest {
 
     @Test
     void shouldGetAllMpaContainsExpectedNames() {
-        List<Mpa> mpaList = mpaController.getMpa();
+        List<MpaDto> mpaList = mpaController.getMpa();
 
         assertThat(mpaList)
-                .extracting(Mpa::getName)
+                .extracting(MpaDto::getName)
                 .containsExactly("G", "PG", "PG-13", "R", "NC-17");
     }
 
     @Test
     void shouldGetAllMpaIdsUnique() {
-        List<Mpa> mpaList = mpaController.getMpa();
+        List<MpaDto> mpaList = mpaController.getMpa();
 
         assertThat(mpaList)
-                .extracting(Mpa::getId)
+                .extracting(MpaDto::getId)
                 .doesNotHaveDuplicates();
     }
 }

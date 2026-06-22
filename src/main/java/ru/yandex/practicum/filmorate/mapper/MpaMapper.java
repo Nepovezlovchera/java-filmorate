@@ -16,10 +16,10 @@ public class MpaMapper {
         return mpa;
     }
 
-    public static MpaDto mapToMPADto(Mpa mpa) {
+    public static MpaDto mapToMpaDto(Mpa mpa) {
         MpaDto dto = new MpaDto();
-        dto.setMpaId(mpa.getId());
-        dto.setMpaName(mpa.getName());
+        dto.setId(mpa.getId());
+        dto.setName(mpa.getName());
 
         return dto;
     }
