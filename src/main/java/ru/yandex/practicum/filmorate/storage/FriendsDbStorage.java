@@ -7,7 +7,6 @@ import ru.yandex.practicum.filmorate.mappers.UserRowMapper;
 import ru.yandex.practicum.filmorate.model.Friends;
 import ru.yandex.practicum.filmorate.model.User;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 

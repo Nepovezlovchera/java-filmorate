@@ -4,8 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.dto.MpaDto;
 import ru.yandex.practicum.filmorate.service.MpaService;
-
-import java.util.Collection;
 import java.util.List;
 
 @RestController

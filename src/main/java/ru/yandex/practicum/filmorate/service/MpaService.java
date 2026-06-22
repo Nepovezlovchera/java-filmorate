@@ -7,7 +7,6 @@ import ru.yandex.practicum.filmorate.mapper.MpaMapper;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.storage.MpaDbStorage;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
