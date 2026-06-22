@@ -27,9 +27,16 @@ public class FilmGenresStorage {
 
     public void addGenres(long filmId, Set<Genre> genres) {
         if (genres == null || genres.isEmpty()) return;
+
         removeAllGenres(filmId);
+
         List<Genre> list = List.copyOf(genres);
-        jdbc.batchUpdate(ADD_GENRE, list, list.size(), (ps, g) -> { ps.setLong(1, filmId); ps.setLong(2, g.getId()); ps.setInt(3, list.indexOf(g)); });
+
+        jdbc.batchUpdate(ADD_GENRE, list, list.size(), (ps, g) -> {
+            ps.setLong(1, filmId);
+            ps.setLong(2, g.getId());
+            ps.setInt(3, list.indexOf(g));
+        });
     }
 
     public void removeAllGenres(long filmId) {
