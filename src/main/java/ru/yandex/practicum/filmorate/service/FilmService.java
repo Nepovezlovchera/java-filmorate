@@ -44,8 +44,9 @@ public class FilmService {
     }
 
     public Collection<FilmDto> getFilms() {
-        return filmdbStorage.getFilms().stream()
-                .map(this::filmWithGenres)
+        Collection<Film> films = filmdbStorage.getFilms();
+        enrichFilmsWithGenres(films);
+        return films.stream()
                 .map(FilmMapper::mapToFilmDto)
                 .collect(Collectors.toList());
     }
@@ -104,16 +105,27 @@ public class FilmService {
             return;
         }
 
-        Set<Genre> validGenres = new LinkedHashSet<>();
-        for (Genre genre : film.getGenres()) {
-            if (genre.getId() == null) {
-                throw new ConditionsNotMetException("ID жанра должен быть указан");
-            }
-            Genre found = genreDbStorage.findByIdGenre(genre.getId())
-                    .orElseThrow(() -> new NotFoundException("Жанр с id = " + genre.getId() + " не найден"));
-            validGenres.add(found);
+        Set<Long> genreIds = film.getGenres().stream()
+                .map(Genre::getId)
+                .collect(Collectors.toSet());
+
+        if (genreIds.contains(null)) {
+            throw new ConditionsNotMetException("ID жанра должен быть указан");
         }
-        film.setGenres(validGenres);
+
+        List<Genre> foundGenres = genreDbStorage.findAllByIds(genreIds);
+
+        if (foundGenres.size() != genreIds.size()) {
+            Set<Long> foundIds = foundGenres.stream().map(Genre::getId).collect(Collectors.toSet());
+            Long missingId = genreIds.stream()
+                    .filter(id -> !foundIds.contains(id))
+                    .findFirst()
+                    .orElse(null);
+
+            throw new NotFoundException("Жанр с id = " + missingId + " не найден");
+        }
+
+        film.setGenres(new LinkedHashSet<>(foundGenres));
     }
 
     public void addLike(long filmId, long userId) {
@@ -128,9 +140,24 @@ public class FilmService {
     }
 
     public Collection<FilmDto> getPopular(int count) {
-        return filmdbStorage.getPopular(count).stream()
-                .map(this::filmWithGenres)
+        Collection<Film> films = filmdbStorage.getFilms();
+        enrichFilmsWithGenres(films);
+
+        return films.stream()
+                .sorted((f1, f2) -> Long.compare(
+                        likeDbStorage.countLikes(f2.getId()),
+                        likeDbStorage.countLikes(f1.getId())))
+                .limit(count)
                 .map(FilmMapper::mapToFilmDto)
                 .collect(Collectors.toList());
+    }
+
+    private void enrichFilmsWithGenres(Collection<Film> films) {
+        if (films == null || films.isEmpty()) return;
+
+        for (Film film : films) {
+            List<Genre> genres = filmGenresStorage.getGenresByFilmId(film.getId());
+            film.setGenres(new LinkedHashSet<>(genres));
+        }
     }
 }

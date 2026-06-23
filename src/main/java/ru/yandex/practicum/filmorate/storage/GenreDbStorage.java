@@ -8,6 +8,8 @@ import ru.yandex.practicum.filmorate.model.Genre;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Repository
 public class GenreDbStorage extends BaseStorage<Genre> {
@@ -38,5 +40,16 @@ public class GenreDbStorage extends BaseStorage<Genre> {
 
     public Optional<Genre> findByIdGenre(Long id) {
         return findOne(FIND_BY_ID, id);
+    }
+
+    public List<Genre> findAllByIds(Set<Long> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return List.of();
+        }
+        String sql = "SELECT * FROM genre WHERE genre_id IN ("
+                + ids.stream().map(String::valueOf).collect(Collectors.joining(","))
+                + ") ORDER BY genre_id";
+
+        return jdbc.query(sql, mapper);
     }
 }

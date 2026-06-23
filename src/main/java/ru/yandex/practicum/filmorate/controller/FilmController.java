@@ -34,17 +34,13 @@ public class FilmController {
 
     @PostMapping
     public FilmDto createFilm(@Valid @RequestBody Film film) {
-        if (film.getReleaseDate() != null &&
-                film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
-            throw new ConditionsNotMetException("Дата релиза не может быть раньше 28 декабря 1895 года");
-        }
-        validate(film);
+        validateReleaseDate(film);
         return filmService.createFilm(film);
     }
 
     @PutMapping
     public FilmDto updateFilm(@RequestBody Film newFilm) {
-        validateUpdate(newFilm);
+        validateReleaseDate(newFilm);
         return filmService.updateFilm(newFilm);
     }
 
@@ -63,33 +59,10 @@ public class FilmController {
         return filmService.getPopular(count);
     }
 
-    private void validate(Film film) {
-        if (film.getName() == null || film.getName().isBlank()) {
-            throw new ConditionsNotMetException("Название не может быть пустым");
-        }
-        if (film.getDescription() != null && film.getDescription().length() > 200) {
-            throw new ConditionsNotMetException("Максимальная длина описания — 200 символов");
-        }
-        if (film.getReleaseDate() != null && film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
+    private void validateReleaseDate(Film film) {
+        if (film.getReleaseDate() != null &&
+                film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
             throw new ConditionsNotMetException("Дата релиза не может быть раньше 28 декабря 1895 года");
-        }
-        if (film.getDuration() <= 0) {
-            throw new ConditionsNotMetException("Продолжительность фильма должна быть положительным числом");
-        }
-    }
-
-    private void validateUpdate(Film film) {
-        if (film.getName() != null && film.getName().isBlank()) {
-            throw new ConditionsNotMetException("Название не может быть пустым");
-        }
-        if (film.getDescription() != null && film.getDescription().length() > 200) {
-            throw new ConditionsNotMetException("Максимальная длина описания — 200 символов");
-        }
-        if (film.getReleaseDate() != null && film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
-            throw new ConditionsNotMetException("Дата релиза не может быть раньше 28 декабря 1895 года");
-        }
-        if (film.getDuration() < 0) {
-            throw new ConditionsNotMetException("Продолжительность фильма должна быть положительным числом");
         }
     }
 }
